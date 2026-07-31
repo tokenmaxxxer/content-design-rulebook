@@ -20,13 +20,21 @@ claude plugin install content-design
 ## Layout
 
 - `content-design/.claude-plugin/plugin.json` — plugin manifest
-- `content-design/hooks/hooks.json` — SessionStart + PreToolUse wiring
-- `content-design/hooks/directive.sh` — SessionStart role directive
-- `content-design/hooks/record-fields-gate.sh` — this role's record required-field gate
-- `content-design/hooks/trailer-gate.sh` — commit `Subject: issue-<n>` trailer gate
-- `content-design/hooks/handbook-trigger-gate.sh` — s21 handbook-sync gate
-- `content-design/agents/warrant-hunter.md` — rotating-stance hunt agent
+- `content-design/hooks/hooks.json` — SessionStart wiring (directive.sh only)
+- `content-design/hooks/directive.sh` — SessionStart role directive; stub that
+  sources core canon's `core/hooks/lib/role-directive.sh` and passes this
+  role's four unique values (core issue #66)
 - `docs/specs/approvers.md` — Approve-authority allowlist (see below)
+
+The role-agnostic gates (record-fields, trailer, handbook-trigger) and the
+warrant-hunt background agent no longer have local copies here — they are
+core canon, registered globally via `core/hooks/hooks.json` (core issue #66)
+and the `warrant/` plugin (core issue #63) and fire for every role through
+`CLAUDE_ROLE` injection. This role's required-record-field list (copy draft,
+rationale per string, A/B alternative) lives only in `directive.sh`'s
+PRODUCES line — core's `record-fields-gate.sh` checks contract §20's
+generic fields (what-was-done/why/upstream-basis/loop_state/open-findings),
+not a per-role field list, so no separate config file is needed for it.
 
 This is scaffolding, not a finished rulebook: fill in doctrine detail,
 handoff enforcement, and any role-specific progress gate before treating
