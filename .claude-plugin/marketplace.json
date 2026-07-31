@@ -8,6 +8,31 @@
       "name": "content-design",
       "source": "./content-design",
       "description": "The content-design role on contract v3 (issue-160 round-3 promotion). Decides: 문구가 사용자의 실제 결정을 돕는가."
+    },
+    {
+      "name": "content-design-phase1-basis",
+      "source": "./content-design-phase1-basis",
+      "description": "Gate: phase-1 content-design proposal must rest on a stated survey+scout basis (or documented skip per the standing scout-directive)."
+    },
+    {
+      "name": "content-design-decision-rationale",
+      "source": "./content-design-decision-rationale",
+      "description": "Gate: decision-tied rationale — phase-1 proposal (one basis-level statement) and phase-2 record ([decision] -> [why] per copy string), same script branching on mode."
+    },
+    {
+      "name": "content-design-tone-axis",
+      "source": "./content-design-tone-axis",
+      "description": "Gate: NN Group 4-axis tone check per copy string in the phase-2 content-design record, present-or-skipped-with-reason."
+    },
+    {
+      "name": "content-design-ab-spec",
+      "source": "./content-design-ab-spec",
+      "description": "Gate: testable A/B variant spec per copy string in the phase-2 content-design record — exactly one varied element + user-behavior signal, or not-applicable + reason."
+    },
+    {
+      "name": "content-design-self-critique",
+      "source": "./content-design-self-critique",
+      "description": "Gate: self-critique note per copy string in the phase-2 content-design record, present and ordered after the rationale/tone/A-B sections it checks."
     }
   ]
 }

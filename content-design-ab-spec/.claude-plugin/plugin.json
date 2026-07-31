@@ -1,0 +1,7 @@
+{
+  "name": "content-design-ab-spec",
+  "description": "Testable A/B variant spec per copy string: exactly one varied element + user-behavior signal, or explicit not-applicable + reason.",
+  "author": {
+    "name": "Jung Jiwon & Lee Jongkwan"
+  }
+}
