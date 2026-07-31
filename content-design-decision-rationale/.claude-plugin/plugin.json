@@ -1,0 +1,7 @@
+{
+  "name": "content-design-decision-rationale",
+  "description": "Decision-tied rationale: phase-1 proposal mode requires one basis-level rationale statement; phase-2 record mode requires a [decision] -> [why] construction per copy string.",
+  "author": {
+    "name": "Jung Jiwon & Lee Jongkwan"
+  }
+}
