@@ -62,3 +62,21 @@ next same-or-higher-level header. `content-design-self-critique` is the
 only one of the four that also reads the *other three's* section
 markers (rationale/tone/A-B), to check ordering — it does not call
 their scripts.
+
+## Verification pipeline (`tests/run-all.sh`)
+
+`tests/run-all.sh` runs each of the 5 gate suites, then — after issue-13's
+A+ closure — a `compliance-check.sh` stage per plugin. Every gate/directive
+script's `. "$CLAUDE_PLUGIN_ROOT_CORE/..."` source line must end in
+`|| { echo "<name>: cannot source <lib>.sh" >&2; exit 2; }` (core issue-75's
+guard form, applied by reference — see `docs/handbooks/gate-house-standard.md`'s
+transition note in core canon): an unguarded source is fail-open, since a
+failed `source` defines no `gate_*` functions and the standard
+`gate_kill_switch_active ... || { exit 0; }` idiom then reads the resulting
+127 as kill-switch-off. Each gate suite's own `run_case` list therefore
+carries a missing-core case (`CLAUDE_PLUGIN_ROOT_CORE` pointed at a
+nonexistent path) asserting deny (exit 2), alongside the 5 pre-existing
+handbook-mandatory cases. `compliance-check.sh` itself (core canon,
+referenced via `CLAUDE_PLUGIN_ROOT_CORE`, never vendored) is run against
+each plugin's `hooks/` directory as a mechanical backstop that would have
+caught the unguarded-source regression on its own.

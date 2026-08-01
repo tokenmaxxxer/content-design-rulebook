@@ -217,6 +217,9 @@ printf '## copy string twelve\nno spec here at all.\n## copy string thirteen (un
 make_write_json "$CASE_O_CONTENT" "$CASE_O_JSON" "$TARGET_FILE"
 run_case "case (o) A/B spec present but in a different section -> exit 2 (defect 4 regression)" "$CASE_O_JSON" 2
 
+# (p) CLAUDE_PLUGIN_ROOT_CORE pointed nowhere -> guarded source must deny, not allow (issue-75/issue-13)
+run_case "case (p) missing core (CLAUDE_PLUGIN_ROOT_CORE nonexistent) -> exit 2, not silent-allow" "$CASE_G_JSON" 2 env CLAUDE_PLUGIN_ROOT_CORE="$WORKDIR/no-such-core"
+
 if [ "${DEBUG_KEEP_WORKDIR:-}" != "1" ]; then
   rm -rf "$WORKDIR"
 else

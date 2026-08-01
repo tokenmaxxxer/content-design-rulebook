@@ -24,4 +24,23 @@ for t in "${TESTS[@]}"; do
   fi
 done
 
+# compliance-check.sh (core canon, issue-72/issue-75): structural check that
+# every *-gate.sh here is on the guarded gate-lib.sh source form. Referenced
+# from core, never vendored (docs/handbooks/canon-scripts.md).
+CORE_COMPLIANCE_CHECK="${CLAUDE_PLUGIN_ROOT_CORE:-$HOME/tokenmaxxxer/tokenmaxxxer-core/core}/hooks/tests/compliance-check.sh"
+if [ -x "$CORE_COMPLIANCE_CHECK" ] || [ -f "$CORE_COMPLIANCE_CHECK" ]; then
+  for plugin in content-design content-design-ab-spec content-design-decision-rationale content-design-phase1-basis content-design-self-critique content-design-tone-axis; do
+    echo "== compliance-check.sh: $plugin/hooks =="
+    if bash "$CORE_COMPLIANCE_CHECK" "$plugin/hooks"; then
+      echo "PASS: compliance-check.sh $plugin/hooks"
+    else
+      echo "FAIL: compliance-check.sh $plugin/hooks"
+      fail=1
+    fi
+  done
+else
+  echo "FAIL: compliance-check.sh not found at $CORE_COMPLIANCE_CHECK" >&2
+  fail=1
+fi
+
 exit "$fail"
