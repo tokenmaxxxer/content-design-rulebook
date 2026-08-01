@@ -182,6 +182,9 @@ CASE_J_JSON="$WORKDIR/case_j.json"
 make_bash_json "$CASE_J_JSON" "printf 'stuff' > docs/issue-9/proposals/content-design-plan.md"
 run_case "Bash-tool write to gated target -> exit 2" "$CASE_J_JSON" 2
 
+# (k) CLAUDE_PLUGIN_ROOT_CORE pointed nowhere -> guarded source must deny, not allow (issue-75/issue-13)
+run_case "missing core (CLAUDE_PLUGIN_ROOT_CORE nonexistent) -> exit 2, not silent-allow" "$CASE_A_JSON" 2 env CLAUDE_PLUGIN_ROOT_CORE="$WORKDIR/no-such-core"
+
 if [ "${DEBUG_KEEP_WORKDIR:-}" != "1" ]; then
   rm -rf "$WORKDIR"
 else

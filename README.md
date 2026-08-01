@@ -1,8 +1,9 @@
 # content-design-rulebook
 
 Rulebook for the `content-design` role (contract v3 role-handoff protocol), split off
-per `docs/issue-160/proposals/role-taxonomy.md`'s round-3 promotion and
-generated as skeleton scaffolding by issue-170.
+per `docs/issue-160/proposals/role-taxonomy.md`'s round-3 promotion (in the
+taxonomy-owning repo, not this one) and generated as skeleton scaffolding by
+issue-170.
 
 - **decides**: 문구가 사용자의 실제 결정을 돕는가
 - **use_when**: 플로우에 새 카피/마이크로카피가 걸릴 때

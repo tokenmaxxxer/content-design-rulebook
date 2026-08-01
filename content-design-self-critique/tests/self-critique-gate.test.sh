@@ -259,6 +259,9 @@ CASE_L_JSON="$WORKDIR/case_l.json"
 make_write_json "$CASE_L_CONTENT" "$CASE_L_JSON" "$TARGET_FILE"
 run_case "case (l) no per-string section header -> exit 2 (defect 3 regression)" "$CASE_L_JSON" 2
 
+# --- case (m): CLAUDE_PLUGIN_ROOT_CORE pointed nowhere -> guarded source must deny, not allow (issue-75/issue-13) ---
+run_case "case (m) missing core (CLAUDE_PLUGIN_ROOT_CORE nonexistent) -> exit 2, not silent-allow" "$CASE_A_JSON" 2 env CLAUDE_PLUGIN_ROOT_CORE="$WORKDIR/no-such-core"
+
 if [ "${DEBUG_KEEP_WORKDIR:-}" != "1" ]; then
   rm -rf "$WORKDIR"
 else

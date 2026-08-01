@@ -228,6 +228,9 @@ printf '## Copy string: Confirm dialog\n\nno tone information here at all.\n## C
 make_write_json "$CASE_M_CONTENT" "$CASE_M_JSON" "$TARGET_FILE"
 run_case "case (m) axis word present but in a different section -> exit 2 (defect 4 regression)" "$CASE_M_JSON" 2
 
+# (n) CLAUDE_PLUGIN_ROOT_CORE pointed nowhere -> guarded source must deny, not allow (issue-75/issue-13)
+run_case "case (n) missing core (CLAUDE_PLUGIN_ROOT_CORE nonexistent) -> exit 2, not silent-allow" "$CASE_A_JSON" 2 env CLAUDE_PLUGIN_ROOT_CORE="$WORKDIR/no-such-core"
+
 if [ "${DEBUG_KEEP_WORKDIR:-}" != "1" ]; then
   rm -rf "$WORKDIR"
 else
