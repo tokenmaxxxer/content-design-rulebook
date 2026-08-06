@@ -261,6 +261,23 @@ fi
 # (n) CLAUDE_PLUGIN_ROOT_CORE pointed nowhere -> guarded source must deny, not allow (issue-75/issue-13)
 run_case "(n) missing core (CLAUDE_PLUGIN_ROOT_CORE nonexistent) -> exit 2, not silent-allow" "$CASE_A_JSON" 2 env CLAUDE_PLUGIN_ROOT_CORE="$WORKDIR/no-such-core"
 
+# (o) gate must not shell out to mktemp (issue-16 migration regression guard)
+mkdir -p "$WORKDIR/fake-bin"
+cat > "$WORKDIR/fake-bin/mktemp" <<EOF
+#!/usr/bin/env bash
+touch "$WORKDIR/mktemp-invoked.marker"
+exit 1
+EOF
+chmod +x "$WORKDIR/fake-bin/mktemp"
+run_case "(o) gate does not invoke mktemp" "$CASE_A_JSON" 0 env PATH="$WORKDIR/fake-bin:$PATH"
+if [ -e "$WORKDIR/mktemp-invoked.marker" ]; then
+  echo "not ok - (o2) mktemp was invoked by the gate (marker present)"
+  FAIL=1
+else
+  echo "ok - (o2) mktemp was not invoked by the gate"
+fi
+rm -f "$WORKDIR/mktemp-invoked.marker"
+
 if [ "${DEBUG_KEEP_WORKDIR:-}" != "1" ]; then
   rm -rf "$WORKDIR"
 else
