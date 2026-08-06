@@ -185,6 +185,22 @@ run_case "Bash-tool write to gated target -> exit 2" "$CASE_J_JSON" 2
 # (k) CLAUDE_PLUGIN_ROOT_CORE pointed nowhere -> guarded source must deny, not allow (issue-75/issue-13)
 run_case "missing core (CLAUDE_PLUGIN_ROOT_CORE nonexistent) -> exit 2, not silent-allow" "$CASE_A_JSON" 2 env CLAUDE_PLUGIN_ROOT_CORE="$WORKDIR/no-such-core"
 
+# (l) mktemp must not be invoked by the gate anymore -- shadow it with a
+# failing fake and confirm it is never called
+mkdir -p "$WORKDIR/fake-bin"
+cat > "$WORKDIR/fake-bin/mktemp" <<EOF
+#!/usr/bin/env bash
+touch "$WORKDIR/mktemp-invoked.marker"
+exit 1
+EOF
+chmod +x "$WORKDIR/fake-bin/mktemp"
+run_case "gate does not invoke mktemp" "$CASE_A_JSON" 0 env PATH="$WORKDIR/fake-bin:$PATH"
+if [ -e "$WORKDIR/mktemp-invoked.marker" ]; then
+  echo "not ok - gate does not invoke mktemp (marker file present)"
+  FAIL=1
+  rm -f "$WORKDIR/mktemp-invoked.marker"
+fi
+
 if [ "${DEBUG_KEEP_WORKDIR:-}" != "1" ]; then
   rm -rf "$WORKDIR"
 else

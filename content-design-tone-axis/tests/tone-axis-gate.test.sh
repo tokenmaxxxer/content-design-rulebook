@@ -231,6 +231,23 @@ run_case "case (m) axis word present but in a different section -> exit 2 (defec
 # (n) CLAUDE_PLUGIN_ROOT_CORE pointed nowhere -> guarded source must deny, not allow (issue-75/issue-13)
 run_case "case (n) missing core (CLAUDE_PLUGIN_ROOT_CORE nonexistent) -> exit 2, not silent-allow" "$CASE_A_JSON" 2 env CLAUDE_PLUGIN_ROOT_CORE="$WORKDIR/no-such-core"
 
+# (o) mktemp must not be invoked by the gate -- shadow it on PATH with a
+#     marker-dropping fake and confirm the marker never appears (issue-16
+#     mktemp-removal regression).
+mkdir -p "$WORKDIR/fake-bin"
+cat > "$WORKDIR/fake-bin/mktemp" <<EOF
+#!/usr/bin/env bash
+touch "$WORKDIR/mktemp-invoked.marker"
+exit 1
+EOF
+chmod +x "$WORKDIR/fake-bin/mktemp"
+run_case "case (o) mktemp shadowed on PATH -> gate still passes -> exit 0" "$CASE_A_JSON" 0 env PATH="$WORKDIR/fake-bin:$PATH"
+if [ -e "$WORKDIR/mktemp-invoked.marker" ]; then
+  echo "not ok - case (o) mktemp was invoked by the gate (marker present)"
+  FAIL=1
+fi
+rm -f "$WORKDIR/mktemp-invoked.marker"
+
 if [ "${DEBUG_KEEP_WORKDIR:-}" != "1" ]; then
   rm -rf "$WORKDIR"
 else

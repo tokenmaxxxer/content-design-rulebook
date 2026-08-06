@@ -262,6 +262,23 @@ run_case "case (l) no per-string section header -> exit 2 (defect 3 regression)"
 # --- case (m): CLAUDE_PLUGIN_ROOT_CORE pointed nowhere -> guarded source must deny, not allow (issue-75/issue-13) ---
 run_case "case (m) missing core (CLAUDE_PLUGIN_ROOT_CORE nonexistent) -> exit 2, not silent-allow" "$CASE_A_JSON" 2 env CLAUDE_PLUGIN_ROOT_CORE="$WORKDIR/no-such-core"
 
+# --- case (n): mktemp must not be invoked by the gate (no-mktemp regression, issue-16) ---
+mkdir -p "$WORKDIR/fake-bin"
+cat > "$WORKDIR/fake-bin/mktemp" <<EOF
+#!/usr/bin/env bash
+touch "$WORKDIR/mktemp-invoked.marker"
+exit 1
+EOF
+chmod +x "$WORKDIR/fake-bin/mktemp"
+run_case "case (n) gate does not invoke mktemp -> exit 0" "$CASE_A_JSON" 0 env PATH="$WORKDIR/fake-bin:$PATH"
+if [ -e "$WORKDIR/mktemp-invoked.marker" ]; then
+  echo "not ok - case (n2) mktemp marker must be absent after gate run"
+  FAIL=1
+else
+  echo "ok - case (n2) mktemp marker absent after gate run"
+fi
+rm -f "$WORKDIR/mktemp-invoked.marker"
+
 if [ "${DEBUG_KEEP_WORKDIR:-}" != "1" ]; then
   rm -rf "$WORKDIR"
 else

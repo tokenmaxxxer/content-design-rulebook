@@ -16,22 +16,16 @@ command -v python3 >/dev/null 2>&1 || gate_deny "tone-axis-gate" "python3 not fo
 
 INPUT_JSON="$(cat)"
 
-# python3 is invoked against a temp script + temp input file (not
-# "python3 - <<PYEOF" piped from stdin) because a heredoc attached to the
-# same command clobbers the process's stdin, leaving nothing for a
-# sys.stdin.read() call inside the script to see (verified in the
-# pre-migration scripts this replaces).
-PY_SCRIPT="$(mktemp "${TMPDIR:-/tmp}/tone-axis-gate.XXXXXX.py")" || gate_deny "tone-axis-gate" "cannot create temp python file"
-INPUT_JSON_FILE="$(mktemp "${TMPDIR:-/tmp}/tone-axis-gate-input.XXXXXX.json")" || gate_deny "tone-axis-gate" "cannot create temp input file"
-printf '%s' "$INPUT_JSON" > "$INPUT_JSON_FILE"
+# Payload travels via GATE_INPUT_JSON env var; stdin is claimed by the heredoc carrying the python program below.
 
 # Candidate path-shaped tokens for a Bash-tool write, extracted from the
 # whole raw payload (over-inclusive by design -- gate_lib.gate_normalize_path
 # + the scope check in Python below is what actually decides relevance).
 GATE_BASH_TARGETS="$(gate_bash_write_targets "$INPUT_JSON")"
 export GATE_BASH_TARGETS
+export GATE_INPUT_JSON="$INPUT_JSON"
 
-cat > "$PY_SCRIPT" <<'PYEOF'
+RESULT="$(python3 <<'PYEOF'
 import importlib.util
 import json
 import os
@@ -119,8 +113,7 @@ def resolve_current_content(path):
 
 
 def main():
-    with open(sys.argv[1], "r", encoding="utf-8") as f:
-        raw = f.read()
+    raw = os.environ["GATE_INPUT_JSON"]
     payload = gate_lib.gate_parse_json_or_deny(raw, deny)
     tool_name = payload.get("tool_name", "")
     ti = payload.get("tool_input", {}) or {}
@@ -165,10 +158,8 @@ def main():
 
 main()
 PYEOF
-
-RESULT="$(python3 "$PY_SCRIPT" "$INPUT_JSON_FILE")"
+)"
 PY_EXIT=$?
-rm -f "$PY_SCRIPT" "$INPUT_JSON_FILE"
 
 trap - EXIT
 if [ "$PY_EXIT" -ne 0 ]; then
